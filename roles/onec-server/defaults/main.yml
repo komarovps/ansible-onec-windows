@@ -1,0 +1,13 @@
+---
+bin_path: "C:\\Program Files\\1cv8\\{{ v8version }}\\bin"
+
+onec_server_find_services: yes
+
+onec_server_install_params: "/SERVER=1 /SERVERCLIENT=1"
+onec_server_srv_name: "1C:Enterprise 8.3 Server Agent"
+onec_server_ragent_path: "{{ bin_path }}\\ragent.exe"
+onec_server_srv_params: '-srvc -agent -regport 1541 -port 1540 -range 1560:1591 -d "C:\Program Files\1cv8\srvinfo" -debug'
+
+ras_path: "{{ bin_path }}\\ras.exe"
+ras_srv_name: '1C:Remote Administation Service (RAS)'
+ras_srv_params: cluster --service --port=1545 localhost:1540
