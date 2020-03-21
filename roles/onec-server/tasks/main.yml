@@ -1,0 +1,56 @@
+---
+
+- include: find-services.yml
+  when: onec_server_find_services is defined and onec_server_find_services
+
+- name: add new chocolatey internal source
+  win_chocolatey_source:
+    name: choco.picompany.ru
+    state: present
+    source: http://svt1cz01.picompany.ru/chocolatey
+
+- name: install onec server {{ v8version }} x64
+  win_chocolatey:
+    name: 1c
+    version: '{{ v8version }}'
+    params: '{{ onec_server_install_params}}'
+    force: yes
+    allow_multiple: yes
+  register: onec_server_install_result
+
+- debug:
+    var: onec_server_install_result
+
+- name: create onec server service
+  win_service:
+    name: '{{ onec_server_srv_name }}'
+    path: '{{ onec_server_ragent_path }} {{ onec_server_srv_params }}'
+    start_mode: auto
+    username: '{{ onec_server_srv_usr }}'
+    password: '{{ onec_server_srv_pwd }}'
+    state: started
+
+- name: create RAS service
+  win_service:
+    name: '{{ ras_srv_name }}'
+    path: '{{ ras_path }} {{ ras_srv_params }}'
+    start_mode: auto
+    state: started
+
+
+
+
+
+# # Создание службы удаленного администрирования RAS
+
+
+# # Регистрация консоли администрирования
+# - name: Register server MSC as administrator
+#   win_command: 'cmd.exe RegMSC.cmd'
+#   become: yes
+#   become_method: runas
+#   args: 
+#     chdir: '{{ bin_path }}'
+#   vars:
+#     ansible_become_user: maint1c@PICompany.ru
+#     ansible_become_pass: '{{ maint1c_pwd }}'
