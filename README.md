@@ -39,6 +39,16 @@ Run
 $ ansible-playbook ansible-onec-windows/onec-server.yml
 ```
 
+To find and remove onec and RAS services set
+```
+onec_server_find_services: yes
+```
+
+To copy nethasp.ini from templates set
+```
+copy_nethasp_ini: yes
+```
+
 ### Deploy onec web components on web server
 
 ```
@@ -59,4 +69,10 @@ $ ansible-playbook ansible-onec-windows/onec-server.yml
 Run
 ```
 $ ansible-playbook ansible-onec-windows/onec-webserver.yml
+```
+
+To update v8verson in web.config set
+```
+prev_v8version: "8.3.15.1656"
+update_web_config: true
 ```
