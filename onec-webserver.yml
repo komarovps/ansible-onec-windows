@@ -1,0 +1,11 @@
+---
+- name: deploy onec webserver components
+  hosts: test
+  vars_files:
+    - secrets.yml
+  roles:
+    - role: onec-webserver
+      v8version: "8.3.16.1148"
+      onec_architecture: "x86"
+      update_web_config: true
+      prev_v8version: "8.3.15.1656"

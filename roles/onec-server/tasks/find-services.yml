@@ -1,13 +1,12 @@
-
 ---
 
-- name: copy scripts
+- name: copy onec srv info script
   win_copy:
-    src: "scripts"
-    dest: "{{ ansible_win_temp_dir }}"
+    src: "scripts/get-onec-server-service-info.ps1"
+    dest: "{{ ansible_win_temp_dir }}\\get-onec-server-service-info.ps1"
 
 - name: retrieving onec server service info
-  win_shell: "{{ ansible_win_temp_dir }}\\scripts\\get-onec-server-service-info.ps1"
+  win_shell: "{{ ansible_win_temp_dir }}\\get-onec-server-service-info.ps1"
   register: onec_server_service_info
 - debug: var=onec_server_service_info.stdout_lines
 
@@ -20,7 +19,6 @@
     msg:
       - "onec_server_srv_name : {{ onec_server_srv_name }}"
       - "onec_server_srv_params : {{ onec_server_srv_params }}"
-#      - "onec_server_srv_exists : {{ onec_server_srv_exists }}"
 
 - name: remove onec server service
   win_service:

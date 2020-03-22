@@ -1,0 +1,9 @@
+$folder = '{{ wwwrootpath }}'
+
+foreach ($file in Get-ChildItem $folder -Recurse)
+    {
+        if ($file.Name -like '*web.config'){
+            Write-Host "Processing" $file.FullName
+                (Get-Content $file.FullName).replace('{{ prev_v8version }}', '{{ v8version }}') | Set-Content $file.FullName
+        }
+    }

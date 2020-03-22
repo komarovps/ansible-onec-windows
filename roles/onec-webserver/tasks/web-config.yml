@@ -1,0 +1,14 @@
+---
+
+- name: copy update script
+  win_template:
+    src: update-web-config.ps1.j2
+    dest: "{{ ansible_win_temp_dir }}\\update-web-config.ps1"
+
+- name: update web.config
+  win_shell: .\update-web-config.ps1
+  args:
+    chdir: "{{ ansible_win_temp_dir }}"
+
+
+

@@ -9,7 +9,6 @@
         path: "{{ ansible_win_temp_dir }}"
         state: directory
         ignore_errors: true
-    #- name: uninstall previous platform
   roles:
     - role: onec-server
       v8version: "8.3.16.1148"

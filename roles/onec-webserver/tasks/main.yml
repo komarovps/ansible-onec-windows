@@ -1,0 +1,23 @@
+---
+
+- name: add new chocolatey internal source
+  win_chocolatey_source:
+    name: choco.picompany.ru
+    state: present
+    source: http://svt1cz01.picompany.ru/chocolatey
+
+- name: install onec platform {{ v8version }}
+  win_chocolatey:
+    name: 1c
+    version: '{{ v8version }}'
+    architecture: '{{ onec_architecture }}'
+    params: '{{ onec_install_params }}'
+    force: yes
+    allow_multiple: yes
+  register: onec_install_result
+
+- debug:
+    var: onec_install_result
+
+- include: web-config.yml
+  when: update_web_config is defined and update_web_config and prev_v8version is defined

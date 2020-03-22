@@ -7,5 +7,6 @@ NH_SESSION          =   10
 [NH_NETBIOS]
 [NH_TCPIP]
 NH_USE_BROADCAST    =   Disabled
-{{ nh_server_addr }}
-
+{% for item in nh_server_addr %}
+{{ item }}
+{% endfor %}

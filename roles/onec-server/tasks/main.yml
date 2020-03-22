@@ -37,20 +37,11 @@
     start_mode: auto
     state: started
 
+- name: register server MSC
+  win_shell: "Invoke-Item \"{{ bin_path }}\\RegMSC.cmd\""
 
-
-
-
-# # Создание службы удаленного администрирования RAS
-
-
-# # Регистрация консоли администрирования
-# - name: Register server MSC as administrator
-#   win_command: 'cmd.exe RegMSC.cmd'
-#   become: yes
-#   become_method: runas
-#   args: 
-#     chdir: '{{ bin_path }}'
-#   vars:
-#     ansible_become_user: maint1c@PICompany.ru
-#     ansible_become_pass: '{{ maint1c_pwd }}'
+- name: copy nethasp.ini
+  win_template:
+    src: nethasp.ini.j2
+    dest: "{{ conf_path }}\\nethasp.ini"
+  when: copy_nethasp_ini is defined and copy_nethasp_ini 

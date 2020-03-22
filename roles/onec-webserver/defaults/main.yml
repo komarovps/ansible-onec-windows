@@ -1,0 +1,6 @@
+---
+bin_path: "C:\\Program Files\\1cv8\\{{ v8version }}\\bin"
+onec_install_params: "/WEBSERVEREXT=1"
+onec_architecture: "default"
+update_web_config: false
+wwwrootpath: "C:\\inetpub\\wwwroot"
