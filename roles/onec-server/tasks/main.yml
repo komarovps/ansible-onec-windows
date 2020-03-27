@@ -5,9 +5,9 @@
 
 - name: add new chocolatey internal source
   win_chocolatey_source:
-    name: choco.picompany.ru
+    name: '{{ choco_ext_repo_name }}'
     state: present
-    source: http://svt1cz01.picompany.ru/chocolatey
+    source: '{{ choco_ext_repo_source }}'
 
 - name: install onec server {{ v8version }} x64
   win_chocolatey:

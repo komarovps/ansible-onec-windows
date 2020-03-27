@@ -1,7 +1,7 @@
 ---
 - name: deploy onec server
   hosts: test
-  vars_files:
+  vars_files: 
     - secrets.yml
   pre_tasks:
     - name: create ansible temp directory
