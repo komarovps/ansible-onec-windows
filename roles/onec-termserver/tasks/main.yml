@@ -6,18 +6,25 @@
     state: present
     source: '{{ choco_ext_repo_source }}'
 
-- name: install onec platform {{ v8version }}
+- name: install onec platform {{ v8version }} x64
   win_chocolatey:
     name: 1c
     version: '{{ v8version }}'
-    architecture: '{{ onec_architecture }}'
-    params: '{{ onec_install_params }}'
+    force: yes
+    allow_multiple: yes
+  register: onec_server_install_result
+
+- debug:
+    var: onec_server_install_result
+
+- name: install onec platform {{ v8version }} x86
+  win_chocolatey:
+    name: 1c
+    version: '{{ v8version }}'
+    architecture: 'x86'
     force: yes
     allow_multiple: yes
   register: onec_install_result
 
 - debug:
     var: onec_install_result
-
-- include: web-config.yml
-  when: update_web_config is defined and update_web_config and prev_v8version is defined

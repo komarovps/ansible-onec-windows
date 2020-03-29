@@ -4,7 +4,7 @@ conf_path: "C:\\Program Files\\1cv8\\conf"
 bin_path: "C:\\Program Files\\1cv8\\{{ v8version }}\\bin"
 
 onec_server_find_services: yes
-copy_nethasp_ini: yes
+copy_nethasp_ini: no
 
 onec_server_install_params: "/SERVER=1 /SERVERCLIENT=1"
 onec_server_srv_name: "1C:Enterprise 8.3 Server Agent"

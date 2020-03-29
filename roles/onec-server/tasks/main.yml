@@ -21,6 +21,18 @@
 - debug:
     var: onec_server_install_result
 
+- name: install onec platform {{ v8version }} x86
+  win_chocolatey:
+    name: 1c
+    version: '{{ v8version }}'
+    architecture: 'x86'
+    force: yes
+    allow_multiple: yes
+  register: onec_install_result
+
+- debug:
+    var: onec_install_result
+    
 - name: create onec server service
   win_service:
     name: '{{ onec_server_srv_name }}'
