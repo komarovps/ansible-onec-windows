@@ -1,0 +1,19 @@
+---
+- name: reg comcnrt
+  hosts: onecservers
+  tasks:
+
+    - name: create ansible temp directory
+      win_file:
+        path: "{{ ansible_win_temp_dir }}"
+        state: directory
+        ignore_errors: true
+
+    - name: copy reg script
+      win_copy:
+        src: "scripts/reg-comcntr.cmd"
+        dest: "{{ ansible_win_temp_dir }}\\reg-comcntr.cmd"
+
+    - name: run script
+      win_shell: "Invoke-Item \"{{ ansible_win_temp_dir }}\\reg-comcntr.cmd\""
+

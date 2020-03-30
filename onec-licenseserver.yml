@@ -1,17 +1,25 @@
 ---
 - name: update v8version on CORP license server
-  hosts: test
+  hosts: oneclicenseservers
   vars_files:
     - secrets.yml
   vars:
     prev_v8version: "8.3.15.1656"
-    v8version: "8.3.16.1148"  
+    v8version: "8.3.16.1148"
+    lic_srv_name: 1C:Enterprise  
   tasks:
-    - name: update regestry info
+    - name: update registry info
       win_shell: |
         $reg_path = "HKLM:SYSTEM\CurrentControlSet\Services\1C:Enterprise {{ item }}"
         $value = Get-ItemProperty -Path $reg_path -Name ImagePath
         $newpath = $value.ImagePath.replace('{{ prev_v8version }}', '{{ v8version }}')
         Set-ItemProperty -Path $reg_path -Name ImagePath -Value $newpath
       loop:
-        "{{ query('inventory_hostnames', 'test') }}"
+        "{{ query('inventory_hostnames', 'onecservers') }}"
+
+    - name: restart lic service
+      win_service:
+        name: '{{ lic_srv_name }} {{ item }}'
+        state: restarted
+      loop:
+        "{{ query('inventory_hostnames', 'onecservers') }}"

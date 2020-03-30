@@ -1,8 +1,14 @@
 ---
 - name: deploy onec webserver components
-  hosts: test
+  hosts: onecwebservers
   vars_files:
     - secrets.yml
+  pre_tasks:
+    - name: create ansible temp directory
+      win_file:
+        path: "{{ ansible_win_temp_dir }}"
+        state: directory
+        ignore_errors: true    
   roles:
     - role: onec-webserver
       v8version: "8.3.16.1148"

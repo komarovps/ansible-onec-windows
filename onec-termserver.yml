@@ -1,6 +1,6 @@
 ---
 - name: deploy onec on termserver
-  hosts: test
+  hosts: onecdevterms
   vars_files: 
     - secrets.yml
   pre_tasks:
