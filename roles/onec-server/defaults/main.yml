@@ -1,16 +1,24 @@
 ---
 
-conf_path: "C:\\Program Files\\1cv8\\conf"
-bin_path: "C:\\Program Files\\1cv8\\{{ v8version }}\\bin"
+conf_path: 'C:\Program Files\1cv8\conf'
+bin_path: 'C:\Program Files\1cv8\{{ v8version }}\bin'
 
-onec_server_find_services: yes
+reinstall: no
+x86_install: yes
+update_services: yes
+create_anyway: no
 copy_nethasp_ini: no
+register_comcntr: yes
+register_msc: yes
+install_additional_packages: no
 
-onec_server_install_params: "/SERVER=1 /SERVERCLIENT=1"
-onec_server_srv_name: "1C:Enterprise 8.3 Server Agent"
-onec_server_ragent_path: "{{ bin_path }}\\ragent.exe"
-onec_server_srv_params: '-srvc -agent -regport 1541 -port 1540 -range 1560:1591 -d "C:\Program Files\1cv8\srvinfo" -debug'
+onec_x64_install_params: '/SERVER=1 /SERVERCLIENT=1 /WEBSERVEREXT=1'
+onec_x86_install_params: '/WEBSERVEREXT=1'
 
-ras_path: "{{ bin_path }}\\ras.exe"
-ras_srv_name: '1C:Remote Administation Service (RAS)'
-ras_srv_params: cluster --service --port=1545 localhost:1540
+onec_server_ragent_path: '{{ bin_path }}\ragent.exe'
+onec_server_srv_default_name: '1C:Enterprise 8.3 Server Agent (x86-64)'
+onec_server_srv_default_params: '-srvc -agent -regport 1541 -port 1540 -range 1560:1591 -d "C:\Program Files\1cv8\srvinfo" -debug -http'
+
+ras_path: '{{ bin_path }}\ras.exe'
+ras_srv_default_name: '1C:Remote Administation Service (RAS)'
+ras_srv_default_params: 'cluster --service --port=1545 localhost:1540'

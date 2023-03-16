@@ -1,0 +1,31 @@
+---
+
+- name: change bin_path when x64
+  set_fact:
+    bin_path: 'C:\Program Files\1cv8\{{ v8version }}\bin'
+  when: onec_architecture == 'default'
+
+- name: setting ISAPI and CGI extension
+  win_shell: |
+    $value = '1C Web-service Extension'
+    $newisapiPath = '{{ bin_path }}\wsisapi.dll'
+    $isapiConfiguration = $null
+    $isapiConfiguration = Get-WebConfiguration "/system.webServer/security/isapiCgiRestriction/add[@path='$newisapiPath']/@allowed"
+    if (!$isapiConfiguration) {
+        $isapiConfiguration = Add-WebConfiguration "/system.webServer/security/isapiCgiRestriction" -value @{description=$value;path=$newisapiPath;allowed="True"} -PSPath:IIS:\
+    }
+  ignore_errors: true
+
+- name: copy update script
+  win_template:
+    src: update-web-config.ps1.j2
+    dest: '{{ ansible_win_temp_dir }}\update-web-config.ps1'
+
+- name: update web.config
+  win_shell: .\update-web-config.ps1
+  args:
+    chdir: '{{ ansible_win_temp_dir }}'
+  ignore_errors: true
+
+- name: restart a service
+  win_shell: IISReset /restart

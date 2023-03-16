@@ -1,5 +1,7 @@
-ansible_win_temp_dir: 'C:\temp\ansible'
+ansible_port: 5985
+ansible_connection: winrm
+ansible_winrm_transport: credssp
+ansible_winrm_server_cert_validation: ignore
 
-get_msi_file_info_url: https://gist.githubusercontent.com/komarovps/7c9b38cdeac63f371f8bf1fc0930b695/raw/e217584b27b66e945fcf2685977fc4b13c739a91/getmsifile.ps1
-get_msi_file_info_path: '{{ansible_win_temp_dir }}\getmsifile.ps1'
-
+ansible_win_temp_dir: '%UserProfile%\ansible'
+user_profile_env: '$env:USERPROFILE\ansible'

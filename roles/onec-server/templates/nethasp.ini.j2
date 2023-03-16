@@ -3,10 +3,12 @@ NH_IPX              =   Disabled
 NH_NETBIOS          =   Disabled
 NH_TCPIP            =   Enabled
 NH_SESSION          =   10
+NH_SEND_RCV         =   4
 [NH_IPX]
 [NH_NETBIOS]
 [NH_TCPIP]
 NH_USE_BROADCAST    =   Disabled
+NH_TCPIP_METHOD     =   UDP
 {% for item in nh_server_addr %}
 {{ item }}
 {% endfor %}

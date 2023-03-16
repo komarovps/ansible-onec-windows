@@ -1,6 +1,6 @@
 ---
-- name: deploy onec server
-  hosts: onecservers
+- name: deploy onec on dev term
+  hosts: onecdevterms
   vars_files: 
     - secrets.yml
   pre_tasks:
@@ -10,5 +10,5 @@
         state: directory
         ignore_errors: true
   roles:
-    - role: onec-server
+    - role: onec-devterm
       #v8version: "8.3.18.1483"

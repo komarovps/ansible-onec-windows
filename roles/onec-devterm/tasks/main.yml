@@ -1,0 +1,59 @@
+---
+
+- name: add new chocolatey internal source
+  win_chocolatey_source:
+    name: '{{ choco_ext_repo_name }}'
+    state: present
+    source: '{{ choco_ext_repo_source }}'
+
+- name: install onec platform {{ v8version }} x64
+  win_chocolatey:
+    name: 1c
+    version: '{{ v8version }}'
+    params: '{{ onec_x64_install_params}}'
+    force: '{{ reinstall }}'
+    allow_multiple: yes
+    timeout: 600
+  register: onec_server_install_result
+
+- debug:
+    var: onec_server_install_result
+
+- name: install onec platform {{ v8version }} x86
+  win_chocolatey:
+    name: 1c_2
+    version: '{{ v8version }}'
+    architecture: 'x86'
+    params: '{{ onec_x86_install_params}}'
+    force: '{{ reinstall }}'
+    allow_multiple: yes
+    timeout: 600
+  register: onec_install_result
+
+- debug:
+    var: onec_install_result
+
+- name: register server MSC
+  win_shell: 'Invoke-Item "{{ bin_path }}\RegMSC.cmd"'
+  become: yes
+  become_method: runas
+  when: register_msc
+
+- name: copy reg comcntr.dll script
+  win_template:
+    src: reg-comcntr.cmd.j2
+    dest: '{{ ansible_win_temp_dir }}\reg-comcntr.cmd'
+  
+- name: register comcntr.dll
+  win_shell: 'Invoke-Item "{{ user_profile_env }}\reg-comcntr.cmd"'
+  become: yes
+  become_method: runas
+  when: register_comcntr
+
+- name: install additional packages
+  win_chocolatey:
+    name:
+    - 7zip
+    - notepadplusplus
+  ignore_errors: yes
+  when: install_additional_packages

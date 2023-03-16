@@ -1,6 +1,6 @@
 ---
-- name: deploy onec server
-  hosts: onecservers
+- name: deploy configuration repository server
+  hosts: configreposervers
   vars_files: 
     - secrets.yml
   pre_tasks:
@@ -10,5 +10,4 @@
         state: directory
         ignore_errors: true
   roles:
-    - role: onec-server
-      #v8version: "8.3.18.1483"
+    - role: onec-configrepo-server

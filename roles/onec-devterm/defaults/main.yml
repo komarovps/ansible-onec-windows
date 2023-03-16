@@ -1,0 +1,10 @@
+---
+bin_path: 'C:\Program Files\1cv8\{{ v8version }}\bin'
+
+reinstall: no
+register_comcntr: yes
+register_msc: yes
+install_additional_packages: yes
+
+onec_x64_install_params: '/SERVERCLIENT=1'
+onec_x86_install_params: ''

@@ -12,12 +12,22 @@
     version: '{{ v8version }}'
     architecture: '{{ onec_architecture }}'
     params: '{{ onec_install_params }}'
-    force: yes
+    force: '{{ reinstall }}'
     allow_multiple: yes
   register: onec_install_result
 
 - debug:
     var: onec_install_result
+    verbosity: 1
 
-- include: web-config.yml
-  when: update_web_config is defined and update_web_config and prev_v8version is defined
+- include: iis.yml
+  when: >
+    server_type == "iis" and 
+    update_web_config and 
+    prev_v8version is defined
+
+- include: apache.yml
+  when: > 
+    server_type == "apache" and
+    update_web_config and 
+    prev_v8version is defined

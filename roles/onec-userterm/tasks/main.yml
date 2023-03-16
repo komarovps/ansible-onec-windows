@@ -10,19 +10,19 @@
   win_chocolatey:
     name: 1c
     version: '{{ v8version }}'
-    force: yes
+    force: '{{ reinstall }}'
     allow_multiple: yes
-  register: onec_server_install_result
+  register: onec_x64_install_result
 
 - debug:
-    var: onec_server_install_result
+    var: onec_x64_install_result
 
 - name: install onec platform {{ v8version }} x86
   win_chocolatey:
-    name: 1c
+    name: 1c_2
     version: '{{ v8version }}'
     architecture: 'x86'
-    force: yes
+    force: '{{ reinstall }}'
     allow_multiple: yes
   register: onec_install_result
 

@@ -1,6 +1,14 @@
 ---
-bin_path: "C:\\Program Files\\1cv8\\{{ v8version }}\\bin"
-onec_install_params: "/WEBSERVEREXT=1"
-onec_architecture: "default"
-update_web_config: false
-wwwrootpath: "C:\\inetpub\\wwwroot"
+
+bin_path: 'C:\Program Files (x86)\1cv8\{{ v8version }}\bin'
+
+reinstall: no
+update_web_config: true
+
+# Параметры SERVER и SERVERCLIENT добавлены чтобы случайно не уронить службу сервера 1С, 
+# если сервер совмещает роль веб-сервера и сервера 1С
+onec_install_params: '/SERVER=1 /SERVERCLIENT=1 /WEBSERVEREXT=1'   
+onec_architecture: 'x86'
+
+server_type: 'iis'
+wwwrootpath: 'C:\inetpub\wwwroot'

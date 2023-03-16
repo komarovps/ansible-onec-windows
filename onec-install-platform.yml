@@ -1,0 +1,43 @@
+---
+- name: install onec platform
+  hosts: onecservers
+  vars_files: 
+    - secrets.yml
+  tasks:
+  
+    - name: add new chocolatey internal source
+      win_chocolatey_source:
+        name: '{{ choco_ext_repo_name }}'
+        state: present
+        source: '{{ choco_ext_repo_source }}'
+
+    # Install
+    - name: install x64 onec platform {{ v8version }}
+      win_chocolatey:
+        name: 1c
+        version: '{{ v8version }}'
+        params: '{{ onec_x64_install_params}}'
+        force: '{{ reinstall }}'
+        allow_multiple: yes
+        timeout: 600
+      register: onec_x64_install_result
+
+    - debug:
+        var: onec_x64_install_result
+        verbosity: 1
+
+    - name: install x86 onec platform {{ v8version }}
+      win_chocolatey:
+        name: 1c_2
+        version: '{{ v8version }}'
+        params: '{{ onec_x86_install_params}}'
+        architecture: 'x86'
+        force: '{{ reinstall }}'
+        allow_multiple: yes
+        timeout: 600
+      register: onec_x86_install_result
+      when: x86_install
+
+    - debug:
+        var: onec_x86_install_result
+        verbosity: 1

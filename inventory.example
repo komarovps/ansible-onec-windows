@@ -1,0 +1,31 @@
+---
+all:
+  children:
+    main:
+      hosts:
+        # onecservers
+        app01:
+        devapp01:
+        # onecwebservers
+        web01:
+        # onecdevterms
+        devterm01:
+        # oneclicenseservers
+        lic01:
+        # configreposervers
+        repo01:
+    onecservers:
+      hosts:
+        app01:
+    onecwebservers:
+      hosts:
+        web01:
+    onecdevterms:
+      hosts:
+        devterm01:
+    oneclicenseservers:
+      hosts:
+        lic01:
+    configreposervers:
+      hosts:
+        repo01:

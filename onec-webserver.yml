@@ -2,7 +2,7 @@
 - name: deploy onec webserver components
   hosts: onecwebservers
   vars_files:
-    - secrets.yml
+   - secrets.yml
   pre_tasks:
     - name: create ansible temp directory
       win_file:
@@ -11,7 +11,5 @@
         ignore_errors: true    
   roles:
     - role: onec-webserver
-      v8version: "8.3.16.1148"
-      onec_architecture: "x86"
-      update_web_config: true
-      prev_v8version: "8.3.15.1656"
+      #v8version: "8.3.18.1483"
+      #prev_v8version: "8.3.18.1334"

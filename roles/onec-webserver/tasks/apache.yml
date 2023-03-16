@@ -1,0 +1,45 @@
+---
+
+- name: retrieving apache services info
+  win_shell: |
+    $result = @()
+    $services = Get-WmiObject win32_service | ? {$_.PathName -like "*\httpd.exe*"}
+    foreach ($service in $services)
+        {
+        $obj = New-Object PSObject
+        $obj | Add-Member -MemberType NoteProperty -Name "Name" -Value $service.Name
+        $apache = $($service.PathName -split "bin\\httpd.exe")[0] | % {$_ -replace '\"', ''} | % {$_.trim()}
+        $conf = Join-Path $apache "conf\httpd.conf"
+        $obj | Add-Member -MemberType NoteProperty -Name "Conf" -Value $conf
+        $result += $obj
+        }
+    ConvertTo-Json -InputObject @( $result )
+  register: apache_services_info
+
+- debug: 
+    var: apache_services_info
+    verbosity: 1
+
+- name: set a services list variable
+  set_fact:
+    services: '{{ apache_services_info.stdout | from_json }}'
+
+- debug:
+    var: services
+    verbosity: 1
+
+- debug:
+    var: services | length
+    verbosity: 1
+  
+- name: update httpd.conf
+  win_shell: |
+    $path = '{{ item.Conf }}'
+    (Get-Content -Path $path).replace('{{ prev_v8version }}', '{{ v8version }}') | Set-Content $path
+  loop: '{{ services }}'
+
+- name: restart a service
+  win_service:
+    name: '{{ item.Name }}'
+    state: restarted
+  loop: '{{ services }}'

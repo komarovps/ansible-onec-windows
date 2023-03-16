@@ -1,0 +1,72 @@
+---
+
+- name: add new chocolatey internal source
+  win_chocolatey_source:
+    name: '{{ choco_ext_repo_name }}'
+    state: present
+    source: '{{ choco_ext_repo_source }}'
+
+- name: grant domain account the SeServiceLogonRight user right
+  win_user_right:
+    name: SeServiceLogonRight
+    users:
+    - '{{ onec_server_srv_usr }}'
+    action: add
+
+# Install
+- name: install x64 onec platform {{ v8version }}
+  win_chocolatey:
+    name: 1c
+    version: '{{ v8version }}'
+    params: '{{ onec_x64_install_params }}'
+    force: '{{ reinstall }}'
+    allow_multiple: yes
+  register: onec_x64_install_result
+
+- debug:
+    var: onec_x64_install_result
+    verbosity: 1
+
+- name: retrieving license services info
+  win_shell: |
+    $result = @()
+    $services = Get-WmiObject win32_service | ?{$_.PathName -like "*{{ prev_v8version }}\bin\ragent.exe*"}
+    foreach ($service in $services) {
+        $parameters = $($service.PathName -split "ragent.exe")[1] | % {$_ -replace '^"', ''} | % {$_.trim()}
+            
+        $obj = New-Object PSObject
+        $obj | Add-Member -MemberType NoteProperty -Name "Name" -Value $service.Name
+        $obj | Add-Member -MemberType NoteProperty -Name "Parameters" -Value $parameters
+        $result += $obj
+    }
+    ConvertTo-Json -InputObject @($result)
+  register: services_info
+
+- debug: 
+    var: services_info
+    verbosity: 1
+
+- name: set a services list variable
+  set_fact:
+    services: '{{ services_info.stdout | from_json }}'
+
+- debug:
+    var: services
+    verbosity: 1
+
+- debug:
+    var: services | length
+    verbosity: 1
+
+- name: update v8version in services
+  win_service:
+    name: '{{ item.Name }}'
+    path: '{{ onec_server_ragent_path }} {{ item.Parameters }}'
+    start_mode: auto
+    username: '{{ onec_server_srv_usr }}'
+    password: '{{ onec_server_srv_pwd }}'
+    state: restarted
+  loop: '{{ services }}'
+  ignore_errors: true
+  when: update_services
+  

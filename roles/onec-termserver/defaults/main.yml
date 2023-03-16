@@ -1,3 +1,0 @@
----
-bin_path: "C:\\Program Files\\1cv8\\{{ v8version }}\\bin"
-onec_install_params: "/WEBSERVEREXT=1"

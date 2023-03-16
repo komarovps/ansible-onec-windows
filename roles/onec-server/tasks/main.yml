@@ -1,59 +1,184 @@
 ---
 
-- include: find-services.yml
-  when: onec_server_find_services is defined and onec_server_find_services
-
 - name: add new chocolatey internal source
   win_chocolatey_source:
     name: '{{ choco_ext_repo_name }}'
     state: present
     source: '{{ choco_ext_repo_source }}'
 
-- name: install onec server {{ v8version }} x64
+- name: grant domain account the SeServiceLogonRight user right
+  win_user_right:
+    name: SeServiceLogonRight
+    users:
+    - '{{ onec_server_srv_usr }}'
+    action: add
+
+# Install
+- name: install x64 onec platform {{ v8version }}
   win_chocolatey:
     name: 1c
     version: '{{ v8version }}'
-    params: '{{ onec_server_install_params}}'
-    force: yes
+    params: '{{ onec_x64_install_params}}'
+    force: '{{ reinstall }}'
     allow_multiple: yes
-  register: onec_server_install_result
+    timeout: 600
+  register: onec_x64_install_result
 
 - debug:
-    var: onec_server_install_result
+    var: onec_x64_install_result
+    verbosity: 1
 
-- name: install onec platform {{ v8version }} x86
+- name: install x86 onec platform {{ v8version }}
   win_chocolatey:
-    name: 1c
+    name: 1c_2
     version: '{{ v8version }}'
+    params: '{{ onec_x86_install_params}}'
     architecture: 'x86'
-    force: yes
+    force: '{{ reinstall }}'
     allow_multiple: yes
-  register: onec_install_result
+    timeout: 600
+  register: onec_x86_install_result
+  when: x86_install|bool
 
 - debug:
-    var: onec_install_result
-    
-- name: create onec server service
+    var: onec_x86_install_result
+    verbosity: 1
+
+# Onec services
+- name: retrieving onec server services info
+  win_shell: |
+    $result = @()
+    $services = Get-WmiObject win32_service | ? {$_.PathName -like "*\ragent.exe*"}
+    foreach ($service in $services)
+        {
+        $obj = New-Object PSObject
+        $obj | Add-Member -MemberType NoteProperty -Name "Name" -Value $service.Name
+        $parameters = $($service.PathName -split "ragent.exe")[1] | % {$_ -replace '^"', ''} | % {$_.trim()}
+        $obj | Add-Member -MemberType NoteProperty -Name "Parameters" -Value $parameters
+        $result += $obj
+        }
+    ConvertTo-Json -InputObject @( $result )
+  register: onec_server_services_info
+
+- debug: 
+    var: onec_server_services_info
+    verbosity: 1
+
+- name: set a services list variable
+  set_fact:
+    services: '{{ onec_server_services_info.stdout | from_json }}'
+
+- debug:
+    var: services
+    verbosity: 1
+
+- debug:
+    var: services | length
+    verbosity: 1
+
+- name: update v8version in onec server services
   win_service:
-    name: '{{ onec_server_srv_name }}'
-    path: '{{ onec_server_ragent_path }} {{ onec_server_srv_params }}'
+    name: '{{ item.Name }}'
+    path: '{{ onec_server_ragent_path }} {{ item.Parameters }}'
+    start_mode: auto
+    username: '{{ onec_server_srv_usr }}'
+    password: '{{ onec_server_srv_pwd }}'
+    state: restarted
+  loop: '{{ services }}'
+  when: update_services
+
+- name: create onec server service if not exist
+  win_service:
+    name: '{{ onec_server_srv_default_name }}'
+    path: '{{ onec_server_ragent_path }} {{ onec_server_srv_default_params }}'
     start_mode: auto
     username: '{{ onec_server_srv_usr }}'
     password: '{{ onec_server_srv_pwd }}'
     state: started
+  when: services | length == 0 or create_anyway
 
-- name: create RAS service
+# RAS services
+- name: retrieving RAS services info
+  win_shell: |
+    $result = @()
+    $services = Get-WmiObject win32_service | ? {$_.PathName -like "*\ras.exe*"}
+    foreach ($service in $services)
+        {
+        $obj = New-Object PSObject
+        $obj | Add-Member -MemberType NoteProperty -Name "Name" -Value $service.Name
+        $parameters = $($service.PathName -split "ras.exe")[1] | % {$_ -replace '^"', ''} | % {$_.trim()}
+        $obj | Add-Member -MemberType NoteProperty -Name "Parameters" -Value $parameters
+        $result += $obj
+        }
+    ConvertTo-Json -InputObject @( $result )
+  register: ras_services_info
+
+- debug: 
+    var: ras_services_info
+    verbosity: 1
+
+- name: set a services list variable
+  set_fact:
+    services: '{{ ras_services_info.stdout | from_json }}'
+
+- debug:
+    var: services
+    verbosity: 1
+
+- debug:
+    var: services | length
+    verbosity: 1
+
+- name: update v8version in RAS services
   win_service:
-    name: '{{ ras_srv_name }}'
-    path: '{{ ras_path }} {{ ras_srv_params }}'
+    name: '{{ item.Name }}'
+    path: '{{ ras_path }} {{ item.Parameters }}'
+    start_mode: auto
+    state: restarted
+  loop: '{{ services }}'
+  when: update_services
+
+- name: create RAS service if not exist
+  win_service:
+    name: '{{ ras_srv_default_name }}'
+    path: '{{ ras_path }} {{ ras_srv_default_params }}'
     start_mode: auto
     state: started
+  when: services | length == 0
+    or create_anyway
 
 - name: register server MSC
-  win_shell: "Invoke-Item \"{{ bin_path }}\\RegMSC.cmd\""
+  win_shell: 'Invoke-Item "{{ bin_path }}\RegMSC.cmd"'
+  become: true
+  become_method: runas
+  when: register_msc
+
+- name: copy reg comcntr.dll script
+  win_template:
+    src: reg-comcntr.cmd.j2
+    dest: '{{ ansible_win_temp_dir }}\reg-comcntr.cmd'
+  
+- name: register comcntr.dll
+  win_shell: 'Invoke-Item "{{ user_profile_env }}\reg-comcntr.cmd"'
+  become: true
+  become_method: runas
+  when: register_comcntr
 
 - name: copy nethasp.ini
   win_template:
     src: nethasp.ini.j2
-    dest: "{{ conf_path }}\\nethasp.ini"
-  when: copy_nethasp_ini is defined and copy_nethasp_ini 
+    dest: '{{ conf_path }}\nethasp.ini'
+  when: copy_nethasp_ini
+
+- name: install additional packages
+  win_chocolatey:
+    name:
+    - sql2012.nativeclient
+    - liberica8jre
+    - 7zip
+    - notepadplusplus
+    - treesizefree
+    - googlechrome
+    - sysinternals
+  ignore_errors: true
+  when: install_additional_packages

@@ -11,7 +11,7 @@ It was tested on the following versions:
 
 ### Operating systems
 
-Tested with Win10 and Ws2012 R2.
+Tested with Win10, Ws2019, Ws2022.
 
 ## Example Playbooks
 
@@ -75,4 +75,25 @@ To update v8verson in web.config set
 ```
 prev_v8version: "8.3.15.1656"
 update_web_config: true
+```
+
+## Ошибки и их решения
+
+### Ошибка при подключении к удаленному хосту:
+
+Текст ошибки:
+```
+credssp: Server did not response with a CredSSP token after step Step 5. Delegate Credentials - actual 'Negotiate, Kerberos, CredSSP'"
+```
+
+Способ устранения:
+1) Проверить что у пользователя под которым идет подключение есть доступ к серверу
+
+Если не помогло:
+
+2) Выполнить на удаленном хосте
+```ps1
+winrm set winrm/config/service/auth '@{CredSSP="true"}'
+winrm set winrm/config/client/auth '@{CredSSP="true"}'
+Enable-WSManCredSSP -Role Server
 ```

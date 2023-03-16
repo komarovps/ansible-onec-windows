@@ -1,0 +1,9 @@
+---
+
+bin_path: 'C:\Program Files\1cv8\{{ v8version }}\bin'
+
+reinstall: no
+update_services: yes
+
+onec_x64_install_params: "/SERVER=1 /SERVERCLIENT=1"
+onec_server_ragent_path: '{{ bin_path }}\ragent.exe'

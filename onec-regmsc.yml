@@ -1,6 +1,9 @@
 ---
-- name: reg comcnrt
+- name: reg regmsc
   hosts: onecservers
+  vars:
+      #v8version: '8.3.18.1483'
+      bin_path: 'C:\Program Files\1cv8\{{ v8version }}\bin'
   tasks:
 
     - name: create ansible temp directory
@@ -9,12 +12,7 @@
         state: directory
         ignore_errors: true
 
-    - name: copy reg script
-      win_copy:
-        src: 'files\reg-comcntr.cmd'
-        dest: '{{ ansible_win_temp_dir }}\reg-comcntr.cmd'
-
     - name: run script
-      win_shell: 'Invoke-Item "{{ ansible_win_temp_dir }}\reg-comcntr.cmd"'
+      win_shell: 'Invoke-Item "{{ bin_path }}\RegMSC.cmd"'
       become: yes
       become_method: runas
